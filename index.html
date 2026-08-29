@@ -34,8 +34,13 @@ html {
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
     "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-  background: radial-gradient(1200px 600px at 80% -10%, #1b2a55 0%, transparent 55%),
-    radial-gradient(900px 500px at -10% 30%, #241b4d 0%, transparent 50%), var(--bg);
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(27, 42, 85, 0.55) 0%, transparent 55%),
+    radial-gradient(900px 500px at -10% 30%, rgba(36, 27, 77, 0.5) 0%, transparent 50%),
+    linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+    var(--bg);
+  background-size: 100% 100%, 100% 100%, 48px 48px, 48px 48px, 100% 100%;
   color: var(--text);
   line-height: 1.7;
   min-height: 100vh;
@@ -50,7 +55,9 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 16px 40px;
-  background: rgba(10, 14, 26, 0.8);
+  background: rgba(10, 14, 26, 0.5);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
 }
@@ -227,16 +234,19 @@ section {
 }
 
 .card {
-  background: var(--panel);
-  border: 1px solid var(--border);
+  background: rgba(21, 29, 48, 0.55);
+  border: 1px solid rgba(35, 48, 82, 0.6);
   border-radius: var(--radius);
   padding: 28px 24px;
-  transition: transform 0.2s, border-color 0.2s;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.3s;
 }
 
 .card:hover {
   transform: translateY(-4px);
   border-color: var(--primary);
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.25);
 }
 
 .card-icon {
@@ -738,10 +748,34 @@ section {
   100% { opacity: 0; transform: translate(-50%, -62%) scale(1); }
 }
 
+
+/* ---------- 入场动画 ---------- */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 24px rgba(0, 212, 255, 0.35); }
+  50% { box-shadow: 0 0 44px rgba(0, 212, 255, 0.6); }
+}
+.enter-anim {
+  animation: fadeInUp 0.8s ease both;
+}
+.nav.enter-anim {
+  animation: fadeIn 0.6s ease both;
+}
+.hero.enter-anim {
+  animation: fadeInUp 0.9s ease both;
+}
+
 </style>
 </head>
 <body>
-  <header class="nav">
+  <header class="nav enter-anim">
     <a href="index.html" class="logo"><span class="logo-badge">G</span>Gt科技</a>
     <button class="nav-toggle" aria-label="菜单">☰</button>
     <ul class="nav-links">
@@ -753,7 +787,7 @@ section {
   </header>
 
   <main>
-    <section class="hero reveal revealed">
+    <section class="hero reveal revealed enter-anim">
       <span class="eyebrow">INTRODUCING NOVATECH</span>
       <h1>用智能科技，让每一天更高效</h1>
       <p>Gt科技 是一款集效率、安全与智能于一体的移动应用，帮助你更好地管理时间、协作与生活。</p>
@@ -986,9 +1020,16 @@ function initScrollReveal() {
 /* ===== 点击屏幕彩蛋：民族→富强→振兴 循环 ===== */
 (function initTapEasterEgg() {
   var words = ["民族", "富强", "振兴"];
-  var idx = 0;
-  var overlay = document.getElementById("tapWord");
+  var idx = -1;
+  var overlay = null;
+  // 确保 DOM 加载后再获取元素
+  function ensureOverlay() {
+    if (!overlay) overlay = document.getElementById("tapWord");
+  }
+  document.addEventListener("DOMContentLoaded", ensureOverlay);
+  // 事件委托：用 document 监听，不管元素何时出现都能响应
   document.addEventListener("click", function (e) {
+    ensureOverlay();
     // 点击弹窗按钮时不触发
     if (e.target.closest(".modal")) return;
     idx = (idx + 1) % words.length;
