@@ -645,9 +645,21 @@ section {
     display: flex;
   }
   .nav-links a {
-    padding: 16px 24px;
+    padding: 20px 24px;
     width: 100%;
     border-bottom: 1px solid rgba(35, 48, 82, 0.55);
+    display: block;
+    font-size: 16px;
+  }
+  .nav-links li {
+    margin: 0;
+  }
+  .nav-links li:last-child a {
+    border-bottom: none;
+  }
+  .nav-links .user-chip {
+    padding: 14px 24px;
+    width: 100%;
   }
   .nav-toggle {
     display: block;
@@ -690,6 +702,46 @@ section {
   to { transform: scale(1); opacity: 1; }
 }
 
+
+/* ---------- 科技感滚动渐入 ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(36px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+  will-change: opacity, transform;
+}
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---------- 点击彩蛋：民族/富强/振兴 ---------- */
+.tap-word {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.4);
+  font-size: 72px;
+  font-weight: 900;
+  letter-spacing: 8px;
+  color: var(--primary);
+  text-shadow: 0 0 30px rgba(0, 212, 255, 0.8), 0 0 60px rgba(124, 92, 255, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 999;
+  font-family: "STKaiti", "KaiTi", serif;
+  white-space: nowrap;
+}
+.tap-word.show {
+  animation: tapPop 0.9s ease forwards;
+}
+@keyframes tapPop {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+  30% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+  60% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -62%) scale(1); }
+}
+
 </style>
 </head>
 <body>
@@ -701,18 +753,11 @@ section {
       <li><a href="download.html">下载</a></li>
       <li><a href="contact.html" class="active">联系我们</a></li>
         <li><a href="#" id="contactAuthor">联系作者</a></li>
-      <li>
-        <span id="navUser" class="user-chip">
-          <span class="user-name"></span>
-          <button id="logoutBtn">退出</button>
-        </span>
-      </li>
-      <li><a href="auth.html" class="btn-login">登录 / 注册</a></li>
     </ul>
   </header>
 
   <main>
-    <section>
+    <section class="reveal">
       <div class="container">
         <div class="section-head">
           <span class="eyebrow">CONTACT US</span>
@@ -764,60 +809,13 @@ section {
       <a href="index.html">首页</a>
       <a href="download.html">下载</a>
       <a href="contact.html">联系我们</a>
-      <a href="auth.html">登录 / 注册</a>
     </div>
     <p>© 2025 Gt科技. All rights reserved.</p>
   </footer>
 
-  <script>
-/* ===== 全局工具 ===== */
-
-// 当前登录用户（localStorage 模拟）
-function getCurrentUser() {
-  try {
-    const raw = localStorage.getItem("ps_user");
-    return raw ? JSON.parse(raw) : null;
-  } catch (e) {
-    return null;
-  }
-}
-
-function setCurrentUser(user) {
-  if (user) localStorage.setItem("ps_user", JSON.stringify(user));
-  else localStorage.removeItem("ps_user");
-}
-
-function getUsers() {
-  try {
-    return JSON.parse(localStorage.getItem("ps_users") || "[]");
-  } catch (e) {
-    return [];
-  }
-}
-
-function saveUsers(users) {
-  localStorage.setItem("ps_users", JSON.stringify(users));
-}
-
-/* ===== 顶部导航栏 ===== */
-
-function renderNavUser() {
-  var user = getCurrentUser();
-  var chip = document.getElementById("navUser");
-  if (!chip) return;
-  if (user) {
-    chip.classList.add("show");
-    var nameEl = chip.querySelector(".user-name");
-    if (nameEl) nameEl.textContent = user.name || user.email;
-  } else {
-    chip.classList.remove("show");
-  }
-}
-
+    <script>
+/* ===== 移动端菜单 ===== */
 document.addEventListener("DOMContentLoaded", function () {
-  renderNavUser();
-
-  // 移动端菜单
   var toggle = document.querySelector(".nav-toggle");
   var links = document.querySelector(".nav-links");
   if (toggle && links) {
@@ -825,138 +823,12 @@ document.addEventListener("DOMContentLoaded", function () {
       links.classList.toggle("open");
     });
   }
-
-  // 退出登录
-  var logoutBtn = document.getElementById("logoutBtn");
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", function () {
-      setCurrentUser(null);
-      renderNavUser();
-      window.location.href = "index.html";
-    });
-  }
 });
 
-/* ===== 登录 / 注册页 ===== */
-
-function isLoginPage() {
-  return !!document.getElementById("loginForm");
-}
-
-function getFormMode() {
-  return document.body.dataset.mode || "login";
-}
-
-function toggleMode(mode) {
-  var loginCard = document.getElementById("loginCard");
-  var registerCard = document.getElementById("registerCard");
-  var cardTitle = document.getElementById("authTitle");
-  var cardSub = document.getElementById("authSub");
-
-  if (mode === "register") {
-    if (loginCard) loginCard.style.display = "none";
-    if (registerCard) registerCard.style.display = "block";
-    if (cardTitle) cardTitle.textContent = "创建账号";
-    if (cardSub) cardSub.textContent = "注册后即可下载我们的 App";
-  } else {
-    if (loginCard) loginCard.style.display = "block";
-    if (registerCard) registerCard.style.display = "none";
-    if (cardTitle) cardTitle.textContent = "欢迎回来";
-    if (cardSub) cardSub.textContent = "登录以继续使用我们的产品";
-  }
-}
-
-function showMsg(msg, type) {
-  var el = document.getElementById("formMsg");
-  if (!el) return;
-  el.textContent = msg;
-  el.className = "form-msg show " + (type || "err");
-}
-
+/* ===== 联系表单 ===== */
 function validateEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
-
-// 登录处理
-function handleLogin(event) {
-  event.preventDefault();
-  var email = document.getElementById("loginEmail").value.trim();
-  var password = document.getElementById("loginPassword").value;
-  var msg = document.getElementById("loginMsg");
-
-  if (!email || !password) {
-    msg.textContent = "请输入邮箱和密码";
-    msg.className = "form-msg show err";
-    return;
-  }
-
-  var users = getUsers();
-  var user = users.find(function (u) {
-    return u.email === email && u.password === password;
-  });
-
-  if (!user) {
-    msg.textContent = "邮箱或密码错误，请重试";
-    msg.className = "form-msg show err";
-    return;
-  }
-
-  setCurrentUser({ name: user.name, email: user.email });
-  msg.textContent = "登录成功，正在跳转…";
-  msg.className = "form-msg show ok";
-  setTimeout(function () {
-    window.location.href = "index.html";
-  }, 800);
-}
-
-// 注册处理
-function handleRegister(event) {
-  event.preventDefault();
-  var name = document.getElementById("regName").value.trim();
-  var email = document.getElementById("regEmail").value.trim();
-  var password = document.getElementById("regPassword").value;
-  var confirm = document.getElementById("regConfirm").value;
-  var msg = document.getElementById("registerMsg");
-
-  if (!name || !email || !password || !confirm) {
-    msg.textContent = "请填写所有字段";
-    msg.className = "form-msg show err";
-    return;
-  }
-  if (!validateEmail(email)) {
-    msg.textContent = "请输入有效的邮箱地址";
-    msg.className = "form-msg show err";
-    return;
-  }
-  if (password.length < 6) {
-    msg.textContent = "密码至少需要 6 位";
-    msg.className = "form-msg show err";
-    return;
-  }
-  if (password !== confirm) {
-    msg.textContent = "两次输入的密码不一致";
-    msg.className = "form-msg show err";
-    return;
-  }
-
-  var users = getUsers();
-  if (users.some(function (u) { return u.email === email; })) {
-    msg.textContent = "该邮箱已被注册";
-    msg.className = "form-msg show err";
-    return;
-  }
-
-  users.push({ name: name, email: email, password: password });
-  saveUsers(users);
-  setCurrentUser({ name: name, email: email });
-  msg.textContent = "注册成功，正在登录…";
-  msg.className = "form-msg show ok";
-  setTimeout(function () {
-    window.location.href = "index.html";
-  }, 800);
-}
-
-/* ===== 联系表单 ===== */
 
 function handleContact(event) {
   event.preventDefault();
@@ -981,14 +853,16 @@ function handleContact(event) {
   event.target.reset();
 }
 
-/* ===== 下载链接（可替换为真实地址） ===== */
+if (document.getElementById("contactForm")) {
+  document.getElementById("contactForm").addEventListener("submit", handleContact);
+}
 
+/* ===== 下载链接（可替换为真实地址） ===== */
 function bindDownloadLinks() {
   document.querySelectorAll("[data-download]").forEach(function (btn) {
     btn.addEventListener("click", function (e) {
       e.preventDefault();
       var target = btn.getAttribute("data-download");
-      // 占位提示：请将 href 替换为真实下载地址
       var msg = document.getElementById("downloadTip");
       if (msg) {
         msg.textContent = "即将开始下载「" + target + "」版本…";
@@ -1001,31 +875,9 @@ function bindDownloadLinks() {
   });
 }
 
-if (isLoginPage()) {
-  document.addEventListener("DOMContentLoaded", function () {
-    var loginForm = document.getElementById("loginForm");
-    var registerForm = document.getElementById("registerForm");
-    var switchToRegister = document.getElementById("switchToRegister");
-    var switchToLogin = document.getElementById("switchToLogin");
-
-    if (loginForm) loginForm.addEventListener("submit", handleLogin);
-    if (registerForm) registerForm.addEventListener("submit", handleRegister);
-    if (switchToRegister) switchToRegister.addEventListener("click", function (e) { e.preventDefault(); toggleMode("register"); });
-    if (switchToLogin) switchToLogin.addEventListener("click", function (e) { e.preventDefault(); toggleMode("login"); });
-
-    // 初始模式
-    if (getFormMode() === "register") toggleMode("register");
-  });
-}
-
-if (document.getElementById("contactForm")) {
-  document.getElementById("contactForm").addEventListener("submit", handleContact);
-}
-
 document.addEventListener("DOMContentLoaded", function () {
   bindDownloadLinks();
 });
-
 
 /* ===== 公告弹窗 ===== */
 function showNotice() {
@@ -1066,7 +918,46 @@ document.addEventListener("DOMContentLoaded", function () {
   bindAuthorModal();
 });
 
+/* ===== 科技感滚动渐入 ===== */
+function initScrollReveal() {
+  var items = document.querySelectorAll(".reveal");
+  if (!("IntersectionObserver" in window)) {
+    items.forEach(function (el) { el.classList.add("revealed"); });
+    return;
+  }
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("revealed");
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  items.forEach(function (el) { observer.observe(el); });
+}
+
+/* ===== 点击屏幕彩蛋：民族→富强→振兴 循环 ===== */
+(function initTapEasterEgg() {
+  var words = ["民族", "富强", "振兴"];
+  var idx = 0;
+  var overlay = document.getElementById("tapWord");
+  document.addEventListener("click", function (e) {
+    if (e.target.closest(".modal")) return;
+    idx = (idx + 1) % words.length;
+    var w = words[idx];
+    if (!overlay) return;
+    overlay.textContent = w;
+    overlay.classList.remove("show");
+    void overlay.offsetWidth;
+    overlay.classList.add("show");
+    clearTimeout(initTapEasterEgg._t);
+    initTapEasterEgg._t = setTimeout(function () {
+      overlay.classList.remove("show");
+    }, 900);
+  });
+})();
 </script>
+
 
   <!-- 公告弹窗 -->
   <div class="modal-overlay" id="noticeModal">
@@ -1090,6 +981,10 @@ document.addEventListener("DOMContentLoaded", function () {
       </div>
     </div>
   </div>
+
+
+  <!-- 点击彩蛋 -->
+  <div class="tap-word" id="tapWord"></div>
 
 </body>
 </html>
