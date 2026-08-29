@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NovaTech — 让科技更简单</title>
-  <meta name="description" content="NovaTech 致力于用智能科技改变生活，提供高效的移动应用和云服务。" />
+  <title>Gt科技 — 让科技更简单</title>
+  <meta name="description" content="Gt科技 致力于用智能科技改变生活，提供高效的移动应用和云服务。" />
   <style>
 :root {
   --bg: #0a0e1a;
@@ -645,8 +645,9 @@ section {
     display: flex;
   }
   .nav-links a {
-    padding: 14px 24px;
+    padding: 16px 24px;
     width: 100%;
+    border-bottom: 1px solid rgba(35, 48, 82, 0.55);
   }
   .nav-toggle {
     display: block;
@@ -656,16 +657,50 @@ section {
   }
 }
 
+
+/* ---------- 弹窗 ---------- */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 8, 18, 0.72);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 30px 26px;
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow);
+  animation: pop 0.25s ease;
+}
+.modal h3 { font-size: 20px; margin-bottom: 14px; color: var(--text); }
+.modal p { color: var(--muted); font-size: 15px; margin-bottom: 24px; line-height: 1.8; }
+.modal-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.modal-actions .btn { padding: 10px 22px; }
+@keyframes pop {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
 </style>
 </head>
 <body>
   <header class="nav">
-    <a href="index.html" class="logo"><span class="logo-badge">N</span>NovaTech</a>
+    <a href="index.html" class="logo"><span class="logo-badge">G</span>Gt科技</a>
     <button class="nav-toggle" aria-label="菜单">☰</button>
     <ul class="nav-links">
       <li><a href="index.html" class="active">首页</a></li>
       <li><a href="download.html">下载</a></li>
       <li><a href="contact.html">联系我们</a></li>
+        <li><a href="#" id="contactAuthor">联系作者</a></li>
       <li>
         <span id="navUser" class="user-chip">
           <span class="user-name"></span>
@@ -680,7 +715,7 @@ section {
     <section class="hero">
       <span class="eyebrow">INTRODUCING NOVATECH</span>
       <h1>用智能科技，让每一天更高效</h1>
-      <p>NovaTech 是一款集效率、安全与智能于一体的移动应用，帮助你更好地管理时间、协作与生活。</p>
+      <p>Gt科技 是一款集效率、安全与智能于一体的移动应用，帮助你更好地管理时间、协作与生活。</p>
       <div class="btn-row">
         <a href="download.html" class="btn btn-primary">立即下载</a>
         <a href="auth.html" class="btn btn-ghost">注册账号</a>
@@ -690,7 +725,7 @@ section {
     <section>
       <div class="container">
         <div class="section-head">
-          <h2>为什么选择 NovaTech</h2>
+          <h2>为什么选择 Gt科技</h2>
           <p>三大核心优势，为你的体验保驾护航</p>
         </div>
         <div class="grid">
@@ -722,7 +757,7 @@ section {
           </div>
           <div class="showcase-text">
             <h2>一套工具，搞定所有任务</h2>
-            <p>NovaTech 将任务管理、团队协作与数据分析整合在同一个平台，告别多应用切换的繁琐。</p>
+            <p>Gt科技 将任务管理、团队协作与数据分析整合在同一个平台，告别多应用切换的繁琐。</p>
             <ul class="feature-list">
               <li>智能任务提醒与日程安排</li>
               <li>团队实时协作与权限管理</li>
@@ -765,7 +800,7 @@ section {
       <div class="container">
         <div class="section-head">
           <h2>准备好开始了吗？</h2>
-          <p>现在就下载 NovaTech，开启高效生活</p>
+          <p>现在就下载 Gt科技，开启高效生活</p>
         </div>
         <div class="btn-row">
           <a href="download.html" class="btn btn-primary">免费下载</a>
@@ -782,7 +817,7 @@ section {
       <a href="contact.html">联系我们</a>
       <a href="auth.html">登录 / 注册</a>
     </div>
-    <p>© 2025 NovaTech. All rights reserved.</p>
+    <p>© 2025 Gt科技. All rights reserved.</p>
   </footer>
 
   <script>
@@ -1042,6 +1077,70 @@ document.addEventListener("DOMContentLoaded", function () {
   bindDownloadLinks();
 });
 
+
+/* ===== 公告弹窗 ===== */
+function showNotice() {
+  var modal = document.getElementById("noticeModal");
+  if (!modal) return;
+  var today = new Date();
+  var dateKey = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+  var hiddenDate = localStorage.getItem("gt_notice_hidden");
+  if (hiddenDate === dateKey) return;
+  modal.classList.add("show");
+  document.getElementById("noticeOk").onclick = function () {
+    modal.classList.remove("show");
+  };
+  document.getElementById("noticeToday").onclick = function () {
+    localStorage.setItem("gt_notice_hidden", dateKey);
+    modal.classList.remove("show");
+  };
+}
+
+/* ===== 联系作者弹窗 ===== */
+function bindAuthorModal() {
+  var authorLink = document.getElementById("contactAuthor");
+  var authorModal = document.getElementById("authorModal");
+  var authorOk = document.getElementById("authorOk");
+  if (authorLink && authorModal) {
+    authorLink.addEventListener("click", function (e) {
+      e.preventDefault();
+      authorModal.classList.add("show");
+    });
+    if (authorOk) authorOk.onclick = function () {
+      authorModal.classList.remove("show");
+    };
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  showNotice();
+  bindAuthorModal();
+});
+
 </script>
+
+  <!-- 公告弹窗 -->
+  <div class="modal-overlay" id="noticeModal">
+    <div class="modal">
+      <h3>最新公告</h3>
+      <p>本网站由Roman制作而成的免费开源软件，快前往体验吧。</p>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="noticeOk">确定</button>
+        <button class="btn btn-primary" id="noticeToday">今日不再显示</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 联系作者弹窗 -->
+  <div class="modal-overlay" id="authorModal">
+    <div class="modal">
+      <h3>联系作者</h3>
+      <p>作者QQ：3837630045</p>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="authorOk">我知道了</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
